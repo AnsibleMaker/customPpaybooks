@@ -1,0 +1,34 @@
+---
+- name: Playbook for space checks
+  hosts: all
+  gather_facts: true
+  vars:
+    windows: ['Microsoft Windows Server 2016 Datacenter',
+              'Microsoft Windows Server 2022 Datacenter',
+              'Microsoft Windows Server 2019 Datacenter']
+  tasks:
+    - name: showing ansible distrubtuion
+      debug:
+        msg: "{{ ansible_distribution }}"
+
+    - name: Checking for space on Linux flavours
+      shell: free -h
+      register: space_lin
+      ignore_errors: true
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Amazon'
+
+    - name: Debug the task for Linux
+      debug:
+        var: space_lin.stdout_lines
+      when: space_lin is defined and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Amazon')
+
+    - name: Checking space on Windows machines
+      win_shell: "Get-PSDrive -PSProvider FileSystem"
+      register: space_win
+      ignore_errors: true  # Corrected typo: "ignore_erros" to "ignore_errors"
+      when: ansible_distribution in windows
+
+    - name: Debug the task for Windows
+      debug:
+        var: space_win.stdout_lines
+      when: space_win is defined and ansible_distribution in windows
