@@ -1,0 +1,43 @@
+---
+- name: Check if RDP firewall rule is open
+  hosts: all
+  gather_facts: true
+  vars:
+    win: ['Microsoft Windows Server 2016 Datacenter',
+          'Microsoft Windows Server 2022 Datacenter',
+          'Microsoft Windows Server 2019 Datacenter']
+  tasks:
+
+    - name: Get all inbound firewall rules
+      win_shell: |
+        Get-NetFirewallRule -Direction Inbound | Select-Object -Property Name, DisplayName, Enabled
+      ignore_errors: true
+      register: inbound_firewall_rules
+      when: ansible_distribution in win
+
+    - name: Get all outbound firewall rules
+      win_shell: |
+        Get-NetFirewallRule -Direction Outbound | Select-Object -Property Name, DisplayName, Enabled
+      ignore_errors: true
+      register: outbound_firewall_rules
+      when: ansible_distribution in win
+
+    - name: Check if RDP inbound rule exists
+      set_fact:
+        rdp_inbound_open: "{{ inbound_firewall_rules.stdout | search('Remote Desktop') | length > 0 }}"
+      when: ansible_distribution in win
+
+    - name: Check if RDP outbound rule exists
+      set_fact:
+        rdp_outbound_open: "{{ outbound_firewall_rules.stdout | search('Remote Desktop') | length > 0 }}"
+      when: ansible_distribution in win
+
+    - name: Display if inbound RDP rule is open
+      debug:
+        msg: "Inbound RDP rule is open: {{ rdp_inbound_open }}"
+      when: ansible_distribution in win
+
+    - name: Display if outbound RDP rule is open
+      debug:
+        msg: "Outbound RDP rule is open: {{ rdp_outbound_open }}"
+      when: ansible_distribution in win
