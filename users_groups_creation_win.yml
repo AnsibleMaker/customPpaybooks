@@ -1,0 +1,28 @@
+---
+- name: Playbook for creating user on windows machine
+  hosts: all
+  gather_facts: true
+  vars:
+    win: ['Microsoft Windows Server 2016 Datacenter',
+                                     'Microsoft Windows Server 2022 Datacenter',
+                                     'Microsoft Windows Server 2019 Datacenter']
+  tasks:
+
+    - name: creating devops group on windows machine
+      ansible.windows.win_group:
+        name: devops
+        description: "devops group"
+        state: present
+      when: ansible_distribution in win
+
+
+    - name: creating user on windows machine
+      ansible.windows.win_user:
+        name: ansibleadmin
+        password: "Welcome2ansible"
+        state: present
+        groups:
+          - devops
+          - Administrators
+      when: ansible_distribution in win
+~
