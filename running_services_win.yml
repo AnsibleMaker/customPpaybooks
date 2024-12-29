@@ -1,0 +1,24 @@
+---
+- name: playbook for checking services runnig on windows
+  hosts: all
+  gather_facts: true
+  vars:
+    win: ['Microsoft Windows Server 2016 Datacenter',
+              'Microsoft Windows Server 2022 Datacenter',
+              'Microsoft Windows Server 2019 Datacenter']
+  tasks:
+
+    - name: running the service facts
+      ansible.windows.win_service_info:
+      register: service
+      when: ansible_distribution in win
+
+    - name: debug the msg
+      debug:
+        var: service.services
+      when: ansible_distribution in win
+
+    - name: services which are runnig
+      debug:
+        var: service.services |selectattr('state', 'equalto', 'running') | list
+      when: ansible_distribution in win
