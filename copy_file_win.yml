@@ -1,0 +1,15 @@
+---
+- name: copying the file
+  hosts: all
+  gather_facts: true
+  vars:
+    win: ['Microsoft Windows Server 2016 Datacenter',
+          'Microsoft Windows Server 2022 Datacenter',
+          'Microsoft Windows Server 2019 Datacenter']
+  tasks:
+
+    - name: started copying the file
+      file:
+        src: /home/ubuntu/ansible/copy.text
+        dest: /desktop/
+
