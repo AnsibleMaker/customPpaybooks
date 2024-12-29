@@ -1,0 +1,39 @@
+---
+- name: Check for installed web browsers
+  hosts: windows
+  gather_facts: true
+
+  tasks:
+
+    - name: Check for Google Chrome
+      win_shell: |
+        Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*Chrome*" }
+      register: chrome_installed
+      ignore_errors: true
+
+    - name: Check for Mozilla Firefox
+      win_shell: |
+        Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*Firefox*" }
+      register: firefox_installed
+      ignore_errors: true
+
+    - name: Check for Microsoft Edge
+      win_shell: |
+        Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*Edge*" }
+      register: edge_installed
+      ignore_errors: true
+
+    - name: Display Chrome installation status
+      debug:
+        msg: "Google Chrome is installed: {{ chrome_installed.stdout }}"
+      when: chrome_installed.stdout != ""
+
+    - name: Display Firefox installation status
+      debug:
+        msg: "Mozilla Firefox is installed: {{ firefox_installed.stdout }}"
+      when: firefox_installed.stdout != ""
+
+    - name: Display Edge installation status
+      debug:
+        msg: "Microsoft Edge is installed: {{ edge_installed.stdout }}"
+      when: edge_installed.stdout != ""
