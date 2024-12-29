@@ -1,0 +1,36 @@
+---
+- name: checking the firewalls on windows machine
+  hosts: all
+  gather_facts: true
+  vars:
+    win: ['Microsoft Windows Server 2016 Datacenter',
+              'Microsoft Windows Server 2022 Datacenter',
+              'Microsoft Windows Server 2019 Datacenter']
+  tasks:
+
+    - name: checking the inbound firewall rules
+      win_firewall_rule:
+        direction: in
+        enabled: yes
+        group: "Remote Desktop"
+      register: inbound_rules
+      when: ansible_distribution in win
+
+    - name: checking the outbound firewall rules
+      win_firewall_rule:
+        direction: out
+        enabled: yes
+        group: "Remote Desktop"
+      register: outbound_rules
+      when: ansible_distribution in win
+
+
+    - name: debug the msg
+      debug:
+        var: inbound_rules
+      when: inbound_rules is defined and ansible_distribution in win
+
+    - name: debug the msg
+      debug:
+        var: outbound_rules.stdout
+      when: outbound_rules is defined and ansible_distribution in win
