@@ -7,9 +7,12 @@
           'Microsoft Windows Server 2022 Datacenter',
           'Microsoft Windows Server 2019 Datacenter']
   tasks:
-
+  
     - name: started copying the file
-      file:
-        src: /home/ubuntu/ansible/copy.text
-        dest: /desktop/
+      win_copy:
+        src: /home/ubuntu/ansible/copy.txt
+        dest: C:/Users/Administrator/Desktop/copy.text
+        state: present
+      when: ansible_distribution in win
+
 
